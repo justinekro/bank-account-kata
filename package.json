@@ -1,0 +1,26 @@
+{
+  "name": "bank-account-kata",
+  "version": "1.0.0",
+  "description": "Bank account solution",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "server": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justinekro/bank-account-kata.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/justinekro/bank-account-kata/issues"
+  },
+  "homepage": "https://github.com/justinekro/bank-account-kata#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jest": "^26.6.3",
+    "mongoose": "^5.10.11"
+  }
+}

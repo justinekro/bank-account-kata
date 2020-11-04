@@ -13,4 +13,4 @@ The project will start with building a REST API and then we will add a user inte
 
 # Run
 
-TODO
+`npm run server`
