@@ -60,7 +60,13 @@ app.post("/operations", async (req, res, next) => {
 
 app.get("/operations", async (req, res, next) => {
 	const allOperations = await Operation.find();
-	return res.status(200).json(allOperations);
+	if (!!allOperations.length) {
+		return res.status(200).json(allOperations);
+	} else {
+		return res
+			.status(400)
+			.json({ error: "You have no operation on your account" });
+	}
 });
 
 module.exports = app;

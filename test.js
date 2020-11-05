@@ -67,7 +67,7 @@ describe("API test", () => {
 		done();
 	});
 
-	it("should note save a operation bigger than account balance", async (done) => {
+	it("should note save an operation bigger than account balance", async (done) => {
 		// first we seed the database with data
 		for (const o of operations) {
 			const op = new Operation(o);
@@ -88,6 +88,12 @@ describe("API test", () => {
 		}
 		const response = await request.get("/operations");
 		expect(response.body.length).toBe(3);
+		done();
+	});
+
+	it("should return error message if no past operations", async (done) => {
+		const response = await request.get("/operations");
+		expect(response.status).toBe(400);
 		done();
 	});
 });
