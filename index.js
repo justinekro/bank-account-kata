@@ -58,4 +58,9 @@ app.post("/operations", async (req, res, next) => {
 	}
 });
 
+app.get("/operations", async (req, res, next) => {
+	const allOperations = await Operation.find();
+	return res.status(200).json(allOperations);
+});
+
 module.exports = app;

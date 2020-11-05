@@ -79,6 +79,17 @@ describe("API test", () => {
 		expect(response.status).toBe(400);
 		done();
 	});
+
+	it("should display all past operations", async (done) => {
+		// first we seed the database with data
+		for (const o of operations) {
+			const op = new Operation(o);
+			await op.save();
+		}
+		const response = await request.get("/operations");
+		expect(response.body.length).toBe(3);
+		done();
+	});
 });
 
 describe("checkBalance test", () => {
