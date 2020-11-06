@@ -96,6 +96,15 @@ describe("API test", () => {
 		expect(response.status).toBe(400);
 		done();
 	});
+
+	it("should display selected operation", async (done) => {
+		const op = new Operation(operationData);
+		const savedOp = await op.save();
+		const response = await request.get(`/operations/${savedOp.id}`);
+		// For savedOp we use the .id mongoDB method that returns a string rather than the ._id that returns an object
+		expect(response.body._id).toBe(savedOp.id);
+		done();
+	});
 });
 
 describe("checkBalance test", () => {

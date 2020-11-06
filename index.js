@@ -69,4 +69,9 @@ app.get("/operations", async (req, res, next) => {
 	}
 });
 
+app.get("/operations/:id", async (req, res, next) => {
+	const operation = await Operation.findOne({ _id: req.params.id });
+	return res.status(200).json(operation);
+});
+
 module.exports = app;
