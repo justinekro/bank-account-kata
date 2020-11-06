@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const app = require("../index.js");
 const supertest = require("supertest");
 const request = supertest(app);
-const Operation = require("../models/operations");
+const Operation = require("../models/operation");
 const { checkBalance } = require("../helpers");
 
 const operationData = {
@@ -36,7 +36,7 @@ const operations = [
 	},
 ];
 
-describe("API test", () => {
+describe("operation routes", () => {
 	beforeAll(async () => {
 		await mongoose.connect(
 			`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.ne3fi.mongodb.net/test?retryWrites=true&w=majority`,

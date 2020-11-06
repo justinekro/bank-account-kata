@@ -4,7 +4,8 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const operationsRoutes = require("./routes/operations");
+const operationRoutes = require("./routes/operation");
+const userRoutes = require("./routes/user");
 
 // used to parse http request bodies
 app.use(bodyParser.json());
@@ -21,6 +22,7 @@ app.use(cors());
 // 	.then(() => console.log("Connected to mongodb"))
 // 	.catch((e) => console.log(e));
 
-app.use("/operations", operationsRoutes);
+app.use("/operations", operationRoutes);
+app.use("/auth", userRoutes);
 
 module.exports = app;

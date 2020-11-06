@@ -1,4 +1,4 @@
-const Operation = require("../models/operations");
+const Operation = require("../models/operation");
 const { checkBalance } = require("../helpers");
 
 exports.createOperation = async (req, res, next) => {
