@@ -40,4 +40,11 @@ describe("user routes", () => {
 		expect(user.name).toBe(userData.name);
 		done();
 	});
+
+	it("should return error if user already exists", async (done) => {
+		const firstRes = await request.post("/auth/signup").send(userData);
+		const secondRes = await request.post("/auth/signup").send(userData);
+		expect(secondRes.status).toBe(400);
+		done();
+	});
 });
