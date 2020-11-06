@@ -1,0 +1,67 @@
+const Operation = require("../models/operations");
+const { checkBalance } = require("../helpers");
+
+exports.createOperation = async (req, res, next) => {
+	delete req.body._id;
+	const operation = new Operation({
+		...req.body,
+	});
+
+	try {
+		// If operation is a withdrawal, need to check if the operation can be performed
+		if (operation.amount < 0) {
+			const currentBalance = await Operation.aggregate([
+				{
+					$group: {
+						_id: null,
+						total: {
+							$sum: "$amount",
+						},
+					},
+				},
+			]);
+
+			if (checkBalance(currentBalance[0].total, operation.amount)) {
+				return res.status(400).json({
+					error:
+						"Not enough money on your account, your current balance is " +
+						currentBalance[0].total,
+				});
+			}
+		}
+		const op = await operation.save();
+		return res.status(200).json(op);
+	} catch (err) {
+		return res.status(400).json({ err });
+	}
+};
+
+exports.getAllOperations = async (req, res, next) => {
+	const allOperations = await Operation.find();
+	if (!!allOperations.length) {
+		return res.status(200).json(allOperations);
+	} else {
+		return res
+			.status(400)
+			.json({ error: "You have no operation on your account" });
+	}
+};
+
+exports.getOneOperation = async (req, res, next) => {
+	try {
+		const operation = await Operation.findById(req.params.id);
+		if (!!operation) {
+			return res.status(200).json(operation);
+		} else {
+			// handles the case where operation used to exist
+			return res
+				.status(400)
+				.json({ error: "Operation not found on the account" });
+		}
+	} catch (e) {
+		// handles the case where operation never existed
+		return res
+			.status(400)
+			.json({ error: "Operation not found on the account" });
+	}
+};

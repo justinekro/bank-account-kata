@@ -3,9 +3,8 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const Operation = require("./models/operations");
-var cors = require("cors");
-const { checkBalance } = require("./helpers");
+const cors = require("cors");
+const operationsRoutes = require("./routes/operations");
 
 // used to parse http request bodies
 app.use(bodyParser.json());
@@ -14,78 +13,14 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // initializing MongoDB
-mongoose
-	.connect(
-		`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.ne3fi.mongodb.net/bankaccount?retryWrites=true&w=majority`,
-		{ useNewUrlParser: true, useUnifiedTopology: true }
-	)
-	.then(() => console.log("Connected to mongodb"))
-	.catch((e) => console.log(e));
+// mongoose
+// 	.connect(
+// 		`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.ne3fi.mongodb.net/bankaccount?retryWrites=true&w=majority`,
+// 		{ useNewUrlParser: true, useUnifiedTopology: true }
+// 	)
+// 	.then(() => console.log("Connected to mongodb"))
+// 	.catch((e) => console.log(e));
 
-// Creating a bank operation
-app.post("/operations", async (req, res, next) => {
-	delete req.body._id;
-	const operation = new Operation({
-		...req.body,
-	});
-
-	try {
-		// If operation is a withdrawal, need to check if the operation can be performed
-		if (operation.amount < 0) {
-			const currentBalance = await Operation.aggregate([
-				{
-					$group: {
-						_id: null,
-						total: {
-							$sum: "$amount",
-						},
-					},
-				},
-			]);
-
-			if (checkBalance(currentBalance[0].total, operation.amount)) {
-				return res.status(400).json({
-					error:
-						"Not enough money on your account, your current balance is " +
-						currentBalance[0].total,
-				});
-			}
-		}
-		const op = await operation.save();
-		return res.status(200).json(op);
-	} catch (err) {
-		return res.status(400).json({ err });
-	}
-});
-
-app.get("/operations", async (req, res, next) => {
-	const allOperations = await Operation.find();
-	if (!!allOperations.length) {
-		return res.status(200).json(allOperations);
-	} else {
-		return res
-			.status(400)
-			.json({ error: "You have no operation on your account" });
-	}
-});
-
-app.get("/operations/:id", async (req, res, next) => {
-	try {
-		const operation = await Operation.findById(req.params.id);
-		if (!!operation) {
-			return res.status(200).json(operation);
-		} else {
-			// handles the case where operation used to exist
-			return res
-				.status(400)
-				.json({ error: "Operation not found on the account" });
-		}
-	} catch (e) {
-		// handles the case where operation never existed
-		return res
-			.status(400)
-			.json({ error: "Operation not found on the account" });
-	}
-});
+app.use("/operations", operationsRoutes);
 
 module.exports = app;

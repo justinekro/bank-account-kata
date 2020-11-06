@@ -1,10 +1,10 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-const app = require("./index.js");
+const app = require("../index.js");
 const supertest = require("supertest");
 const request = supertest(app);
-const Operation = require("./models/operations");
-const { checkBalance } = require("./helpers");
+const Operation = require("../models/operations");
+const { checkBalance } = require("../helpers");
 
 const operationData = {
 	description: "Virement Maman",
