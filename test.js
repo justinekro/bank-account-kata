@@ -105,6 +105,17 @@ describe("API test", () => {
 		expect(response.body._id).toBe(savedOp.id);
 		done();
 	});
+
+	it("should return error message if selected operation does not exist", async (done) => {
+		const op = new Operation(operationData);
+		const savedOp = await op.save();
+		// We then delete the saved Op
+		await Operation.deleteOne({ _id: savedOp.id });
+		const response = await request.get(`/operations/${savedOp.id}`);
+		// For savedOp we use the .id mongoDB method that returns a string rather than the ._id that returns an object
+		expect(response.status).toBe(400);
+		done();
+	});
 });
 
 describe("checkBalance test", () => {

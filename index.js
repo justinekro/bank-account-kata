@@ -70,8 +70,22 @@ app.get("/operations", async (req, res, next) => {
 });
 
 app.get("/operations/:id", async (req, res, next) => {
-	const operation = await Operation.findOne({ _id: req.params.id });
-	return res.status(200).json(operation);
+	try {
+		const operation = await Operation.findById(req.params.id);
+		if (!!operation) {
+			return res.status(200).json(operation);
+		} else {
+			// handles the case where operation used to exist
+			return res
+				.status(400)
+				.json({ error: "Operation not found on the account" });
+		}
+	} catch (e) {
+		// handles the case where operation never existed
+		return res
+			.status(400)
+			.json({ error: "Operation not found on the account" });
+	}
 });
 
 module.exports = app;
