@@ -47,4 +47,12 @@ describe("user routes", () => {
 		expect(secondRes.status).toBe(400);
 		done();
 	});
+
+	it("should login an existing user in database", async (done) => {
+		// we first create a new user in database
+		await request.post("/auth/signup").send(userData);
+		const res = await request.post("/auth/login").send(userData);
+		expect(res.body.token).toBeTruthy();
+		done();
+	});
 });
