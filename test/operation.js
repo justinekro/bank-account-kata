@@ -84,6 +84,16 @@ describe("operation routes", () => {
 		done();
 	});
 
+	it("should not save an operation to database without auth token", async (done) => {
+		const userRes = await request.post("/auth/login").send(userData);
+		const res = await request.post("/operations").send(operationData);
+		expect(res.status).toBe(401);
+		expect(res.body.error).toBe(
+			"Please login to access your bank operations"
+		);
+		done();
+	});
+
 	it("should note save an operation bigger than account balance", async (done) => {
 		const userRes = await request.post("/auth/login").send(userData);
 		// first we seed the database with data
