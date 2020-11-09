@@ -36,7 +36,9 @@ exports.logIn = async (req, res, next) => {
 						{ expiresIn: "24h" }
 					),
 				});
-			} // need to handle else
+			} else {
+				return res.status(401).json({ error: "Wrong password" });
+			}
 		} else {
 			return res.status(401).json({ error: "User not found" });
 		}

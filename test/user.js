@@ -59,6 +59,18 @@ describe("user routes", () => {
 	it("should not login a non existing user in database", async (done) => {
 		const res = await request.post("/auth/login").send(userData);
 		expect(res.status).toBe(401);
+		expect(res.body.error).toBe("User not found");
+		done();
+	});
+
+	it("should not login an existing user with wrong password in database", async (done) => {
+		// we first create a new user in database
+		await request.post("/auth/signup").send(userData);
+		const res = await request
+			.post("/auth/login")
+			.send({ email: userData.email, password: "1234" });
+		expect(res.status).toBe(401);
+		expect(res.body.error).toBe("Wrong password");
 		done();
 	});
 });
