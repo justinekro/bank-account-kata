@@ -14,7 +14,7 @@ const userData = {
 describe("user routes", () => {
 	beforeAll(async () => {
 		await mongoose.connect(
-			`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.ne3fi.mongodb.net/test?retryWrites=true&w=majority`,
+			`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.ne3fi.mongodb.net/test-user?retryWrites=true&w=majority`,
 			{
 				useNewUrlParser: true,
 				useCreateIndex: true,

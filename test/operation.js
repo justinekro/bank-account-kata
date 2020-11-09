@@ -4,7 +4,14 @@ const app = require("../index.js");
 const supertest = require("supertest");
 const request = supertest(app);
 const Operation = require("../models/operation");
+const User = require("../models/user");
 const { checkBalance } = require("../helpers");
+
+const userData = {
+	name: "Justine kro",
+	email: "jujukro@hotmail.ca",
+	password: "coucou",
+};
 
 const operationData = {
 	description: "Virement Maman",
@@ -39,7 +46,7 @@ const operations = [
 describe("operation routes", () => {
 	beforeAll(async () => {
 		await mongoose.connect(
-			`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.ne3fi.mongodb.net/test?retryWrites=true&w=majority`,
+			`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.ne3fi.mongodb.net/test-operation?retryWrites=true&w=majority`,
 			{
 				useNewUrlParser: true,
 				useCreateIndex: true,
@@ -54,12 +61,22 @@ describe("operation routes", () => {
 		);
 	});
 
-	afterEach(async () => {
-		await Operation.deleteMany();
+	beforeEach(async () => {
+		await request.post("/auth/signup").send(userData);
 	});
 
-	it("should save an operation to database", async (done) => {
-		const res = await request.post("/operations").send(operationData);
+	afterEach(async () => {
+		await Operation.deleteMany();
+		await User.deleteMany();
+	});
+
+	it("should save an operation to database with an auth token", async (done) => {
+		const userRes = await request.post("/auth/login").send(userData);
+		const res = await request.post("/operations").send({
+			...operationData,
+			token: userRes.body.token,
+			userId: userRes.body.userId,
+		});
 		const operation = await Operation.findOne({ _id: res.body._id });
 		expect(operation.amount).toBe(operationData.amount);
 		expect(operation.description).toBe(operationData.description);
@@ -68,15 +85,20 @@ describe("operation routes", () => {
 	});
 
 	it("should note save an operation bigger than account balance", async (done) => {
+		const userRes = await request.post("/auth/login").send(userData);
 		// first we seed the database with data
 		for (const o of operations) {
 			const op = new Operation(o);
 			await op.save();
 		}
-		const response = await request
-			.post("/operations")
-			.send(negativeOperationData);
+
+		const response = await request.post("/operations").send({
+			...negativeOperationData,
+			token: userRes.body.token,
+			userId: userRes.body.userId,
+		});
 		expect(response.status).toBe(400);
+		expect(response.body.error).toBe("Not enough money on your account");
 		done();
 	});
 
@@ -101,6 +123,7 @@ describe("operation routes", () => {
 		const op = new Operation(operationData);
 		const savedOp = await op.save();
 		const response = await request.get(`/operations/${savedOp.id}`);
+
 		// For savedOp we use the .id mongoDB method that returns a string rather than the ._id that returns an object
 		expect(response.body._id).toBe(savedOp.id);
 		done();

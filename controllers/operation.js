@@ -23,9 +23,7 @@ exports.createOperation = async (req, res, next) => {
 
 			if (checkBalance(currentBalance[0].total, operation.amount)) {
 				return res.status(400).json({
-					error:
-						"Not enough money on your account, your current balance is " +
-						currentBalance[0].total,
+					error: "Not enough money on your account",
 				});
 			}
 		}
