@@ -55,4 +55,10 @@ describe("user routes", () => {
 		expect(res.body.token).toBeTruthy();
 		done();
 	});
+
+	it("should not login a non existing user in database", async (done) => {
+		const res = await request.post("/auth/login").send(userData);
+		expect(res.status).toBe(401);
+		done();
+	});
 });

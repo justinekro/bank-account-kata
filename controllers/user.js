@@ -37,7 +37,9 @@ exports.logIn = async (req, res, next) => {
 					),
 				});
 			} // need to handle else
-		} // need to handle else
+		} else {
+			return res.status(401).json({ error: "User not found" });
+		}
 	} catch (error) {
 		return res.status(500).json({
 			error: "something went wrong",
