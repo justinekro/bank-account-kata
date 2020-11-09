@@ -5,7 +5,7 @@ const auth = require("../middleware/auth");
 
 router.post("/", auth, operationController.createOperation);
 
-router.get("/", operationController.getAllOperations);
+router.get("/", auth, operationController.getAllOperations);
 
 router.get("/:id", operationController.getOneOperation);
 

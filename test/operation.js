@@ -112,19 +112,25 @@ describe("operation routes", () => {
 		done();
 	});
 
-	it("should display all past operations", async (done) => {
+	it("should display all past operations when user is logged in", async (done) => {
+		const userRes = await request.post("/auth/login").send(userData);
 		// first we seed the database with data
 		for (const o of operations) {
 			const op = new Operation(o);
 			await op.save();
 		}
-		const response = await request.get("/operations");
+		const response = await request
+			.get("/operations")
+			.send({ token: userRes.body.token, userId: userRes.body.userId });
 		expect(response.body.length).toBe(3);
 		done();
 	});
 
 	it("should return error message if no past operations", async (done) => {
-		const response = await request.get("/operations");
+		const userRes = await request.post("/auth/login").send(userData);
+		const response = await request
+			.get("/operations")
+			.send({ token: userRes.body.token, userId: userRes.body.userId });
 		expect(response.status).toBe(400);
 		done();
 	});
