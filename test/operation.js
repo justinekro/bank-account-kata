@@ -159,6 +159,15 @@ describe("operation routes", () => {
 		done();
 	});
 
+	it("should not display selected operation when user is not logged in", async (done) => {
+		const op = new Operation(operationData);
+		const savedOp = await op.save();
+		const response = await request.get(`/operations/${savedOp.id}`);
+		// For savedOp we use the .id mongoDB method that returns a string rather than the ._id that returns an object
+		expect(response.status).toBe(401);
+		done();
+	});
+
 	it("should return error message if selected operation does not exist", async (done) => {
 		const userRes = await request.post("/auth/login").send(userData);
 		const op = new Operation(operationData);
