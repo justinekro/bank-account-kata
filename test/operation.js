@@ -126,6 +126,17 @@ describe("operation routes", () => {
 		done();
 	});
 
+	it("should not display all past operations when user is not logged in", async (done) => {
+		// first we seed the database with data
+		for (const o of operations) {
+			const op = new Operation(o);
+			await op.save();
+		}
+		const response = await request.get("/operations");
+		expect(response.status).toBe(401);
+		done();
+	});
+
 	it("should return error message if no past operations", async (done) => {
 		const userRes = await request.post("/auth/login").send(userData);
 		const response = await request
