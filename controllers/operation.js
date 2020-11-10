@@ -35,7 +35,7 @@ exports.createOperation = async (req, res, next) => {
 };
 
 exports.getAllOperations = async (req, res, next) => {
-	const allOperations = await Operation.find();
+	const allOperations = await Operation.find({ userId: req.body.userId });
 	if (!!allOperations.length) {
 		return res.status(200).json(allOperations);
 	} else {

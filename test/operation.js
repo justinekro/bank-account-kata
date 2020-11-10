@@ -43,6 +43,12 @@ const operations = [
 	},
 ];
 
+const operationWithoutUserId = {
+	description: "Chèque solde de tout compte",
+	amount: 1400,
+	date: new Date(),
+};
+
 describe("operation routes", () => {
 	beforeAll(async () => {
 		await mongoose.connect(
@@ -116,7 +122,7 @@ describe("operation routes", () => {
 		const userRes = await request.post("/auth/login").send(userData);
 		// first we seed the database with data
 		for (const o of operations) {
-			const op = new Operation(o);
+			const op = new Operation({ ...o, userId: userRes.body.userId });
 			await op.save();
 		}
 		const response = await request
@@ -179,6 +185,28 @@ describe("operation routes", () => {
 			.send({ token: userRes.body.token, userId: userRes.body.userId });
 		// For savedOp we use the .id mongoDB method that returns a string rather than the ._id that returns an object
 		expect(response.status).toBe(400);
+		done();
+	});
+
+	it("should only return operations matching current user id", async (done) => {
+		const userRes = await request.post("/auth/login").send(userData);
+		const currentUserId = userRes.body.userId;
+		// first we seed the database with data
+		for (const o of operations) {
+			const op = new Operation({ ...o, userId: currentUserId });
+			await op.save();
+		}
+		// saving an operation without user Id
+		const opWithoutUserId = new Operation(operationWithoutUserId);
+		await opWithoutUserId.save();
+		const response = await request
+			.get("/operations")
+			.send({ token: userRes.body.token, userId: currentUserId });
+		const allOperationsContainUserId = !response.body.find(
+			(o) => o.userId !== currentUserId
+		);
+		expect(response.body.length).toBe(3);
+		expect(allOperationsContainUserId).toBe(true);
 		done();
 	});
 });
