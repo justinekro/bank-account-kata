@@ -87,12 +87,15 @@ describe("operation routes", () => {
 		expect(operation.amount).toBe(operationData.amount);
 		expect(operation.description).toBe(operationData.description);
 		expect(operation.date).toStrictEqual(operationData.date);
+		expect(operation.userId).toBe(userRes.body.userId);
 		done();
 	});
 
 	it("should not save an operation to database without auth token", async (done) => {
 		const userRes = await request.post("/auth/login").send(userData);
-		const res = await request.post("/operations").send(operationData);
+		const res = await request
+			.post("/operations")
+			.send({ ...operationData, userId: userRes.body.userId });
 		expect(res.status).toBe(401);
 		expect(res.body.error).toBe(
 			"Please login to access your bank operations"
@@ -100,18 +103,22 @@ describe("operation routes", () => {
 		done();
 	});
 
-	it("should note save an operation bigger than account balance", async (done) => {
+	it("should note save an operation bigger than user account balance", async (done) => {
 		const userRes = await request.post("/auth/login").send(userData);
+		const currentUserId = userRes.body.userId;
 		// first we seed the database with data
 		for (const o of operations) {
-			const op = new Operation(o);
+			const op = new Operation({ ...o, userId: currentUserId });
 			await op.save();
 		}
+
+		const opWithoutUserId = new Operation(operationWithoutUserId);
+		await opWithoutUserId.save();
 
 		const response = await request.post("/operations").send({
 			...negativeOperationData,
 			token: userRes.body.token,
-			userId: userRes.body.userId,
+			userId: currentUserId,
 		});
 		expect(response.status).toBe(400);
 		expect(response.body.error).toBe("Not enough money on your account");

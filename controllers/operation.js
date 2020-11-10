@@ -11,6 +11,7 @@ exports.createOperation = async (req, res, next) => {
 		// If operation is a withdrawal, need to check if the operation can be performed
 		if (operation.amount < 0) {
 			const currentBalance = await Operation.aggregate([
+				{ $match: { userId: req.body.userId } },
 				{
 					$group: {
 						_id: null,
