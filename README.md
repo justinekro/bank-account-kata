@@ -16,3 +16,5 @@ Tests are made using Jest and Supertest
 # Run
 
 `npm run server`
+
+[![Build Status](https://travis-ci.com/justinekro/bank-account-kata.svg?branch=master)](https://travis-ci.com/justinekro/bank-account-kata)
