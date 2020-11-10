@@ -7,6 +7,6 @@ router.post("/", auth, operationController.createOperation);
 
 router.get("/", auth, operationController.getAllOperations);
 
-router.get("/:id", operationController.getOneOperation);
+router.get("/:id", auth, operationController.getOneOperation);
 
 module.exports = router;

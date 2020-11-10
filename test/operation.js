@@ -146,10 +146,13 @@ describe("operation routes", () => {
 		done();
 	});
 
-	it("should display selected operation", async (done) => {
+	it("should display selected operation when user is logged in", async (done) => {
+		const userRes = await request.post("/auth/login").send(userData);
 		const op = new Operation(operationData);
 		const savedOp = await op.save();
-		const response = await request.get(`/operations/${savedOp.id}`);
+		const response = await request
+			.get(`/operations/${savedOp.id}`)
+			.send({ token: userRes.body.token, userId: userRes.body.userId });
 
 		// For savedOp we use the .id mongoDB method that returns a string rather than the ._id that returns an object
 		expect(response.body._id).toBe(savedOp.id);
@@ -157,11 +160,14 @@ describe("operation routes", () => {
 	});
 
 	it("should return error message if selected operation does not exist", async (done) => {
+		const userRes = await request.post("/auth/login").send(userData);
 		const op = new Operation(operationData);
 		const savedOp = await op.save();
 		// We then delete the saved Op
 		await Operation.deleteOne({ _id: savedOp.id });
-		const response = await request.get(`/operations/${savedOp.id}`);
+		const response = await request
+			.get(`/operations/${savedOp.id}`)
+			.send({ token: userRes.body.token, userId: userRes.body.userId });
 		// For savedOp we use the .id mongoDB method that returns a string rather than the ._id that returns an object
 		expect(response.status).toBe(400);
 		done();
