@@ -154,7 +154,10 @@ describe("operation routes", () => {
 
 	it("should display selected operation when user is logged in", async (done) => {
 		const userRes = await request.post("/auth/login").send(userData);
-		const op = new Operation(operationData);
+		const op = new Operation({
+			...operationData,
+			userId: userRes.body.userId,
+		});
 		const savedOp = await op.save();
 		const response = await request
 			.get(`/operations/${savedOp.id}`)
@@ -207,6 +210,18 @@ describe("operation routes", () => {
 		);
 		expect(response.body.length).toBe(3);
 		expect(allOperationsContainUserId).toBe(true);
+		done();
+	});
+
+	it("should not display selected operation if user Id doest not match current user Id", async (done) => {
+		const userRes = await request.post("/auth/login").send(userData);
+		const op = new Operation({ ...operationData, userId: "1234" });
+		const savedOp = await op.save();
+		const response = await request
+			.get(`/operations/${savedOp.id}`)
+			.send({ token: userRes.body.token, userId: userRes.body.userId });
+		expect(response.status).toBe(400);
+		expect(response.body.error).toBe("Operation not found on the account");
 		done();
 	});
 });

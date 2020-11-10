@@ -47,7 +47,10 @@ exports.getAllOperations = async (req, res, next) => {
 
 exports.getOneOperation = async (req, res, next) => {
 	try {
-		const operation = await Operation.findById(req.params.id);
+		const operation = await Operation.findOne({
+			_id: req.params.id,
+			userId: req.body.userId,
+		});
 		if (!!operation) {
 			return res.status(200).json(operation);
 		} else {
