@@ -76,6 +76,10 @@ describe("operation routes", () => {
 		await User.deleteMany();
 	});
 
+	afterAll(async () => {
+		await mongoose.disconnect();
+	});
+
 	it("should save an operation to database with an auth token", async (done) => {
 		const userRes = await request.post("/auth/login").send(userData);
 		const res = await request.post("/operations").send({
@@ -111,10 +115,8 @@ describe("operation routes", () => {
 			const op = new Operation({ ...o, userId: currentUserId });
 			await op.save();
 		}
-
 		const opWithoutUserId = new Operation(operationWithoutUserId);
 		await opWithoutUserId.save();
-
 		const response = await request.post("/operations").send({
 			...negativeOperationData,
 			token: userRes.body.token,
@@ -169,7 +171,6 @@ describe("operation routes", () => {
 		const response = await request
 			.get(`/operations/${savedOp.id}`)
 			.send({ token: userRes.body.token, userId: userRes.body.userId });
-
 		// For savedOp we use the .id mongoDB method that returns a string rather than the ._id that returns an object
 		expect(response.body._id).toBe(savedOp.id);
 		done();

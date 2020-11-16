@@ -33,6 +33,10 @@ describe("user routes", () => {
 		await User.deleteMany();
 	});
 
+	afterAll(async () => {
+		await mongoose.disconnect();
+	});
+
 	it("should create a new user in database", async (done) => {
 		const res = await request.post("/auth/signup").send(userData);
 		const user = await User.findOne({ email: res.body.email });

@@ -4,7 +4,7 @@
   "description": "Bank account solution",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --forceExit",
     "server": "nodemon start.js"
   },
   "repository": {
